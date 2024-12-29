@@ -6,11 +6,10 @@ import './HeroSlider.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-// Base64 encoded simple stripe pattern for displacement
 const DEFAULT_DISPLACEMENT_MAP = '/images/Displacements/fluid.jpg';
 const DEFAULT_TRANSITION_DURATION = 2;
 
-// Shader code as strings
+// --- Vertex Shader ---
 const vertexShaderSource = `
   varying vec2 vUv;
 
@@ -20,6 +19,7 @@ const vertexShaderSource = `
   }
 `;
 
+// --- Fragment Shader ---
 const fragmentShaderSource = `
   precision mediump float;
 
@@ -28,6 +28,7 @@ const fragmentShaderSource = `
   uniform sampler2D displacementMap;
   uniform float progress;
   uniform float intensity;
+  uniform float direction;
 
   varying vec2 vUv;
 
@@ -36,10 +37,11 @@ const fragmentShaderSource = `
     float displacementFactor = displacement.r * intensity;
     
     vec2 distortedUV = vUv;
-    distortedUV.x = vUv.x + progress * (displacementFactor);
-    
+    // Move x-coordinates based on direction
+    distortedUV.x = vUv.x + progress * displacementFactor * direction;
+
     vec2 distortedUV2 = vUv;
-    distortedUV2.x = vUv.x - (1.0 - progress) * (displacementFactor);
+    distortedUV2.x = vUv.x - (1.0 - progress) * displacementFactor * direction;
     
     vec4 currentColor = texture2D(currentTexture, distortedUV);
     vec4 nextColor = texture2D(nextTexture, distortedUV2);
@@ -58,6 +60,9 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
   width = '100%',
   height = '100vh',
 }) => {
+  /**
+   * Refs for Three.js objects
+   */
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -65,107 +70,144 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
 
   /**
-   * We’ll keep one GSAP timelineRef if needed for current transition,
-   * but remove repeated calls to `startAutoplay`.
+   * Timeline & autoplay refs
    */
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
-
-  /**
-   * We'll track the setTimeout for autoplay in a separate ref 
-   * so we can clear it properly and avoid stacking timeouts.
-   */
   const autoplayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  /**
+   * State for current slide and loaded textures
+   */
   const [currentIndex, setCurrentIndex] = useState(0);
   const texturesRef = useRef<THREE.Texture[]>([]);
   const displacementMapsRef = useRef<Map<string, THREE.Texture>>(new Map());
 
+  /**
+   * Track visibility with IntersectionObserver
+   */
+  const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * Initialize the slider once it becomes visible
+   */
+  useEffect(() => {
+    if (!isVisible) return;
+
     let cleanupFn: (() => void) | undefined;
-    
     const initialize = async () => {
       cleanupFn = await init();
     };
 
-    // Only initialize if the component is mounted and visible
-    if (containerRef.current && containerRef.current.offsetParent !== null) {
-      console.log('[HeroSlider] Initializing...');
-      initialize();
-    }
+    initialize();
 
     return () => {
-      console.log('[Component Cleanup] Unmounting HeroSlider');
+      if (cleanupFn) cleanupFn();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]);
 
-      // Kill any active timeline
+  /**
+   * Cleanup on unmount
+   */
+  useEffect(() => {
+    return () => {
+      // Kill GSAP timeline
       if (timelineRef.current) {
         timelineRef.current.kill();
         timelineRef.current = null;
       }
 
-      // Clear any autoplay timeouts
+      // Clear autoplay
       if (autoplayTimeoutRef.current) {
         clearTimeout(autoplayTimeoutRef.current);
         autoplayTimeoutRef.current = null;
       }
 
-      // Call the cleanup function returned by init (if any)
-      if (cleanupFn) {
-        cleanupFn();
-      }
-
-      // Dispose of textures
-      texturesRef.current.forEach(texture => {
-        if (texture && texture.dispose) {
-          console.log('[Cleanup] Disposing texture');
+      // Dispose textures
+      texturesRef.current.forEach((texture) => {
+        if (texture.dispose) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('[Cleanup] Disposing texture');
+          }
           texture.dispose();
         }
       });
       texturesRef.current = [];
 
-      // Dispose of displacement maps
+      // Dispose displacement maps
       displacementMapsRef.current.forEach((texture) => {
-        if (texture && texture.dispose) {
-          console.log('[Cleanup] Disposing displacement map');
+        if (texture.dispose) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('[Cleanup] Disposing displacement map');
+          }
           texture.dispose();
         }
       });
       displacementMapsRef.current.clear();
 
-      // Dispose of material
+      // Dispose material
       if (materialRef.current) {
-        console.log('[Cleanup] Disposing material');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[Cleanup] Disposing material');
+        }
         materialRef.current.dispose();
         materialRef.current = null;
       }
 
-      // Dispose of geometry and renderer
+      // Dispose geometry and renderer
       if (rendererRef.current) {
         const renderer = rendererRef.current;
         const scene = sceneRef.current;
-        
+
         if (scene) {
           scene.traverse((object) => {
             if (object instanceof THREE.Mesh) {
               if (object.geometry) {
-                console.log('[Cleanup] Disposing geometry');
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log('[Cleanup] Disposing geometry');
+                }
                 object.geometry.dispose();
               }
               if (object.material) {
                 if (Array.isArray(object.material)) {
-                  object.material.forEach(material => {
-                    console.log('[Cleanup] Disposing array material');
-                    material.dispose();
+                  object.material.forEach((m) => {
+                    if (process.env.NODE_ENV !== 'production') {
+                      console.log('[Cleanup] Disposing array material');
+                    }
+                    m.dispose();
                   });
                 } else {
-                  console.log('[Cleanup] Disposing single material');
+                  if (process.env.NODE_ENV !== 'production') {
+                    console.log('[Cleanup] Disposing single material');
+                  }
                   object.material.dispose();
                 }
               }
             }
           });
         }
-        
-        console.log('[Cleanup] Disposing renderer');
+
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[Cleanup] Disposing renderer');
+        }
         renderer.dispose();
         renderer.forceContextLoss();
         const gl = renderer.getContext();
@@ -176,28 +218,104 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
         rendererRef.current = null;
       }
     };
-  }, []); // Only run on mount/unmount
+  }, []);
 
+  /**
+   * Resize handler
+   */
   useEffect(() => {
     const handleResize = () => {
       if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
       const { clientWidth, clientHeight } = containerRef.current;
       rendererRef.current.setSize(clientWidth, clientHeight);
+      // Re-render one frame to adjust to new size
+      renderFrame();
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const init = async () => {
-    if (!containerRef.current || containerRef.current.offsetParent === null) {
-      console.log('[HeroSlider] Container not visible, skipping initialization');
-      return;
-    }
+  /**
+   * ---------------------------------------------
+   * Touch/Swipe support
+   * ---------------------------------------------
+   */
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-    console.log('[HeroSlider] Starting initialization');
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+    const threshold = 75; // Increased threshold for more intentional swipes
+    const timeThreshold = 300; // Maximum time for a swipe in ms
+    let touchStartTime = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+      isSwiping = false;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isSwiping) {
+        const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+        const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+        
+        // If horizontal movement is greater than vertical, it's likely a swipe
+        if (deltaX > deltaY && deltaX > 10) {
+          isSwiping = true;
+          e.preventDefault(); // Prevent scrolling when swiping
+        }
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndTime = Date.now();
+      const timeDiff = touchEndTime - touchStartTime;
+      
+      // Only process swipe if:
+      // 1. We detected a horizontal swipe
+      // 2. The swipe was fast enough
+      // 3. The distance was greater than threshold
+      if (isSwiping && timeDiff < timeThreshold) {
+        const diff = touchEndX - touchStartX;
+        if (Math.abs(diff) > threshold) {
+          if (diff < 0) {
+            goToNextSlide();
+          } else {
+            goToPrevSlide();
+          }
+        }
+      }
+    };
+
+    const containerEl = containerRef.current;
+    
+    containerEl.addEventListener('touchstart', handleTouchStart, { passive: true });
+    containerEl.addEventListener('touchmove', handleTouchMove, { passive: false }); // non-passive to prevent scroll
+    containerEl.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      containerEl.removeEventListener('touchstart', handleTouchStart);
+      containerEl.removeEventListener('touchmove', handleTouchMove);
+      containerEl.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
+
+  /**
+   * Initialize scene and load resources
+   */
+  const init = async () => {
+    if (!containerRef.current) return;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[HeroSlider] Starting initialization');
+    }
     try {
-      // Initialize Three.js scene
+      // Create scene
       const scene = new THREE.Scene();
       sceneRef.current = scene;
 
@@ -206,19 +324,19 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
       camera.position.z = 1;
       cameraRef.current = camera;
 
-      // Create renderer with power preference for better performance
-      const renderer = new THREE.WebGLRenderer({ 
+      // Create renderer
+      const renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
-        powerPreference: 'high-performance'
+        powerPreference: 'high-performance',
       });
       renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
       containerRef.current.appendChild(renderer.domElement);
       rendererRef.current = renderer;
 
-      // Load textures
+      // Load all slide textures
       const textureLoader = new THREE.TextureLoader();
-      const loadTexture = (url: string) => 
+      const loadTexture = (url: string) =>
         new Promise<THREE.Texture>((resolve, reject) => {
           textureLoader.load(
             url,
@@ -229,51 +347,35 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
             },
             undefined,
             (error) => {
-              console.error(`Error loading texture ${url}:`, error);
+              console.error(`[HeroSlider] Error loading texture ${url}:`, error);
               reject(error);
             }
           );
         });
 
-      console.log('Loading slide textures...');
-      // Load slide textures with progress tracking
       const loadedTextures = await Promise.all(
-        slides.map(async (slide, index) => {
-          console.log(`Loading texture ${index + 1}/${slides.length}: ${slide.imageUrl}`);
-          try {
-            const texture = await loadTexture(slide.imageUrl);
-            console.log(`Successfully loaded texture ${index + 1}`);
-            return texture;
-          } catch (error) {
-            console.error(`Failed to load texture ${index + 1}:`, error);
-            throw error;
-          }
-        })
+        slides.map((slide) => loadTexture(slide.imageUrl))
       );
-
-      console.log(`Successfully loaded ${loadedTextures.length} textures`);
-
-      if (loadedTextures.length === 0) {
-        throw new Error('No textures loaded');
+      if (!loadedTextures.length) {
+        throw new Error('[HeroSlider] No textures loaded');
       }
-
       texturesRef.current = loadedTextures;
 
-      // Create default displacement texture
-      console.log('Loading displacement map:', defaultDisplacementMap);
+      // Displacement map
       const displacementTexture = await loadTexture(defaultDisplacementMap);
       displacementTexture.wrapS = THREE.RepeatWrapping;
       displacementTexture.wrapT = THREE.RepeatWrapping;
       displacementMapsRef.current.set(defaultDisplacementMap, displacementTexture);
 
-      // Create shader material
+      // Create material (notice we added "direction" to uniforms)
       const material = new THREE.ShaderMaterial({
         uniforms: {
           currentTexture: { value: loadedTextures[0] },
           nextTexture: { value: loadedTextures[1] || loadedTextures[0] },
           displacementMap: { value: displacementTexture },
           progress: { value: 0 },
-          intensity: { value: displacementIntensity }
+          intensity: { value: displacementIntensity },
+          direction: { value: 1 }, // Default direction
         },
         vertexShader: vertexShaderSource,
         fragmentShader: fragmentShaderSource,
@@ -287,15 +389,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
-      // Animation loop with RAF ID tracking
-      let animationFrameId: number;
-      const animate = () => {
-        if (rendererRef.current && sceneRef.current && cameraRef.current) {
-          rendererRef.current.render(sceneRef.current, cameraRef.current);
-        }
-        animationFrameId = requestAnimationFrame(animate);
-      };
-      animate();
+      // Render one initial frame
+      renderFrame();
 
       // Start autoplay if enabled
       let autoplayCleanup: (() => void) | null = null;
@@ -303,105 +398,100 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
         autoplayCleanup = startAutoplay();
       }
 
-      // Return cleanup function
+      // Return cleanup function for this init
       return () => {
-        console.log('[Cleanup] Canceling animation frame');
-        cancelAnimationFrame(animationFrameId);
         if (autoplayCleanup) {
-          console.log('[Cleanup] Running autoplay cleanup');
           autoplayCleanup();
         }
       };
-    } catch (error) {
-      console.error('[Error] Failed to initialize HeroSlider:', error);
-      // Attempt cleanup on error
+    } catch (err) {
+      console.error('[HeroSlider] Failed to initialize:', err);
+      // Clean up partial initialization
       if (rendererRef.current) {
         rendererRef.current.dispose();
         rendererRef.current = null;
       }
-      throw error;
+      throw err;
     }
   };
 
   /**
-   * We’ll keep a single instance of `startAutoplay` running.
-   * This function sets a single timeout for the next transition
-   * and clears it on cleanup or on subsequent calls.
+   * Utility to render a single frame
+   */
+  const renderFrame = () => {
+    if (rendererRef.current && sceneRef.current && cameraRef.current) {
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+    }
+  };
+
+  /**
+   * Start autoplay: schedule a transition after `autoplayDuration`
    */
   const startAutoplay = () => {
     if (!materialRef.current || !texturesRef.current.length) return null;
 
-    // Clear any existing timeline
+    // Clear existing timeline
     if (timelineRef.current) {
       timelineRef.current.kill();
       timelineRef.current = null;
     }
 
-    // Clear any existing autoplay timeout
+    // Clear existing timeout
     if (autoplayTimeoutRef.current) {
       clearTimeout(autoplayTimeoutRef.current);
       autoplayTimeoutRef.current = null;
     }
 
-    /**
-     * Animates to the next slide once the timeout finishes.
-     */
     const animateNext = async () => {
-      // If there's no material or no textures, abort
       if (!materialRef.current || !texturesRef.current.length) return;
 
       const nextIndex = (currentIndex + 1) % slides.length;
-      console.log(`[Autoplay] Current Index: ${currentIndex}, Next Index: ${nextIndex}`);
 
-      // Kill any current timeline
+      // Kill any existing timeline
       if (timelineRef.current) {
         timelineRef.current.kill();
         timelineRef.current = null;
       }
-
-      // Create a new timeline for the transition
       const newTimeline = gsap.timeline();
       timelineRef.current = newTimeline;
 
       try {
-        // Prepare transition uniforms (async load displacement, etc.)
+        // Update effect
         const effects = await updateSlideEffect(currentIndex, nextIndex);
-        if (!effects) return;
-        const { currentEffect } = effects;
 
-        // Animate the progress from 0→1
-        await new Promise<void>((resolve) => {
-          newTimeline
-            .to(materialRef.current!.uniforms.progress, {
-              value: 0,
-              duration: 0,
-              ease: 'none'
-            })
-            .to(materialRef.current!.uniforms.progress, {
-              value: 1,
-              duration: currentEffect.transitionDuration,
-              ease: 'power3.inOut',
-              onComplete: () => {
-                setCurrentIndex(nextIndex);
-                resolve();
-              },
-            });
+        if (!effects) return;
+
+        // **Set direction to +1 for next**
+        materialRef.current.uniforms.direction.value = 1;
+
+        // Render in a loop during the transition
+        startRendering();
+        newTimeline.to(materialRef.current.uniforms.progress, {
+          value: 1,
+          duration: effects.currentEffect.transitionDuration,
+          ease: 'power3.inOut',
+          onComplete: () => {
+            // End of transition
+            setCurrentIndex(nextIndex);
+            stopRendering(); // Stop continuous rendering
+            // Render a final frame
+            renderFrame();
+          },
         });
       } catch (err) {
-        console.error('[Error] Transition failed:', err);
+        console.error('[HeroSlider] Transition failed:', err);
       }
 
-      // After transition completes, schedule next autoplay if still enabled
+      // Schedule next if autoplay still enabled
       if (autoplay) {
-        console.log(`[Autoplay] Scheduling next transition in ${autoplayDuration}ms`);
         autoplayTimeoutRef.current = setTimeout(animateNext, autoplayDuration);
       }
     };
 
-    // Immediately queue up the next slide (i.e., wait `autoplayDuration`)
+    // Queue up next transition
     autoplayTimeoutRef.current = setTimeout(animateNext, autoplayDuration);
 
-    // Return cleanup function to kill timeline / timeout
+    // Cleanup function
     return () => {
       if (autoplayTimeoutRef.current) {
         clearTimeout(autoplayTimeoutRef.current);
@@ -414,16 +504,43 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
     };
   };
 
+  /**
+   * Start a continuous rendering loop
+   * (only used during transitions)
+   */
+  const renderingRAFRef = useRef<number | null>(null);
+  const startRendering = () => {
+    stopRendering();
+    const renderLoop = () => {
+      renderFrame();
+      renderingRAFRef.current = requestAnimationFrame(renderLoop);
+    };
+    renderLoop();
+  };
+  const stopRendering = () => {
+    if (renderingRAFRef.current !== null) {
+      cancelAnimationFrame(renderingRAFRef.current);
+      renderingRAFRef.current = null;
+    }
+  };
+
+  /**
+   * Determine displacement settings for a given slide
+   */
   const getSlideEffect = (index: number) => {
     const slide = slides[index];
     return {
       displacementMap: slide.effect?.displacementMap || defaultDisplacementMap,
       intensity: slide.effect?.intensity || displacementIntensity,
       duration: slide.effect?.duration || autoplayDuration,
-      transitionDuration: slide.effect?.transitionDuration || defaultTransitionDuration
+      transitionDuration:
+        slide.effect?.transitionDuration || DEFAULT_TRANSITION_DURATION,
     };
   };
 
+  /**
+   * Lazy-load displacement map if not already loaded
+   */
   const loadDisplacementMap = async (url: string) => {
     if (displacementMapsRef.current.has(url)) {
       return displacementMapsRef.current.get(url)!;
@@ -440,81 +557,62 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
           resolve(texture);
         },
         undefined,
-        reject
+        (err) => {
+          console.error('[HeroSlider] Error loading displacement map:', err);
+          reject(err);
+        }
       );
     });
   };
 
+  /**
+   * Update the shader uniforms for the current and next slide
+   */
   const updateSlideEffect = async (currentIdx: number, nextIdx: number) => {
     if (!materialRef.current) return null;
-
-    console.log(`[Transition Start] From slide ${currentIdx} to ${nextIdx}`);
-    console.log('Current slide:', slides[currentIdx]);
-    console.log('Next slide:', slides[nextIdx]);
 
     const currentEffect = getSlideEffect(currentIdx);
     const nextEffect = getSlideEffect(nextIdx);
 
-    console.log('[Effect Settings]', {
-      current: {
-        displacementMap: currentEffect.displacementMap,
-        intensity: currentEffect.intensity,
-        duration: currentEffect.duration,
-        transitionDuration: currentEffect.transitionDuration
-      },
-      next: {
-        displacementMap: nextEffect.displacementMap,
-        intensity: nextEffect.intensity,
-        duration: nextEffect.duration,
-        transitionDuration: nextEffect.transitionDuration
-      }
-    });
-
-    const startTime = performance.now();
-    const [currentMap, nextMap] = await Promise.all([
+    // We can load both if they differ, but here we only need the immediate one
+    const [currentMap] = await Promise.all([
       loadDisplacementMap(currentEffect.displacementMap),
-      loadDisplacementMap(nextEffect.displacementMap)
+      loadDisplacementMap(nextEffect.displacementMap),
     ]);
-    const loadTime = performance.now() - startTime;
-    console.log(`[Assets Loaded] Took ${loadTime.toFixed(2)}ms`);
 
-    // Update uniforms
-    materialRef.current.uniforms.currentTexture.value = texturesRef.current[currentIdx];
-    materialRef.current.uniforms.nextTexture.value = texturesRef.current[nextIdx];
-    materialRef.current.uniforms.displacementMap.value = currentMap;
-    materialRef.current.uniforms.intensity.value = currentEffect.intensity;
+    // Reset progress to 0
     materialRef.current.uniforms.progress.value = 0;
 
-    console.log('[Uniforms Updated]', {
-      currentTexture: currentIdx,
-      nextTexture: nextIdx,
-      intensity: currentEffect.intensity,
-      progress: 0
-    });
+    // Switch out textures
+    materialRef.current.uniforms.currentTexture.value =
+      texturesRef.current[currentIdx];
+    materialRef.current.uniforms.nextTexture.value =
+      texturesRef.current[nextIdx];
+    materialRef.current.uniforms.displacementMap.value = currentMap;
+    materialRef.current.uniforms.intensity.value = currentEffect.intensity;
+
+    // Render a frame to update immediately
+    renderFrame();
 
     return {
       currentEffect,
       nextEffect,
       currentMap,
-      nextMap
     };
   };
 
   /**
-   * NOTE:
-   * We remove the call to `startAutoplay()` inside these next/prev functions
-   * to avoid re-initializing the autoplay loop repeatedly.
+   * Manually go to next slide (left-to-right)
    */
   const goToNextSlide = async () => {
-    if (!materialRef.current || !texturesRef.current.length || timelineRef.current?.isActive()) return;
+    if (!materialRef.current || !texturesRef.current.length) return;
+    if (timelineRef.current?.isActive()) return;
 
-    // Kill the active timeline if any
+    // Kill timeline & clear autoplay
     if (timelineRef.current) {
       timelineRef.current.kill();
       timelineRef.current = null;
     }
-
-    // Clear autoplay timeout so it doesn't trigger mid-transition
     if (autoplayTimeoutRef.current) {
       clearTimeout(autoplayTimeoutRef.current);
       autoplayTimeoutRef.current = null;
@@ -526,36 +624,37 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
 
     const effects = await updateSlideEffect(currentIndex, nextIndex);
     if (!effects) return;
-    const { currentEffect } = effects;
 
-    newTimeline
-      .to(materialRef.current.uniforms.progress, {
-        value: 0,
-        duration: 0,
-        ease: 'none'
-      })
-      .to(materialRef.current.uniforms.progress, {
-        value: 1,
-        duration: currentEffect.transitionDuration,
-        ease: 'power3.inOut',
-        onComplete: () => {
-          setCurrentIndex(nextIndex);
-          // If we still want autoplay after manual navigation:
-          if (autoplay) {
-            startAutoplay();
-          }
+    // **Set direction to +1** for left-to-right
+    materialRef.current.uniforms.direction.value = 1;
+
+    startRendering();
+    newTimeline.to(materialRef.current.uniforms.progress, {
+      value: 1,
+      duration: effects.currentEffect.transitionDuration,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        setCurrentIndex(nextIndex);
+        stopRendering(); // Stop once transition ends
+        renderFrame();
+        if (autoplay) {
+          startAutoplay();
         }
-      });
+      },
+    });
   };
 
+  /**
+   * Manually go to previous slide (right-to-left)
+   */
   const goToPrevSlide = async () => {
-    if (!materialRef.current || !texturesRef.current.length || timelineRef.current?.isActive()) return;
+    if (!materialRef.current || !texturesRef.current.length) return;
+    if (timelineRef.current?.isActive()) return;
 
     if (timelineRef.current) {
       timelineRef.current.kill();
       timelineRef.current = null;
     }
-
     if (autoplayTimeoutRef.current) {
       clearTimeout(autoplayTimeoutRef.current);
       autoplayTimeoutRef.current = null;
@@ -567,45 +666,56 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
 
     const effects = await updateSlideEffect(currentIndex, prevIndex);
     if (!effects) return;
-    const { currentEffect } = effects;
 
-    newTimeline
-      .to(materialRef.current.uniforms.progress, {
-        value: 0,
-        duration: 0,
-        ease: 'none'
-      })
-      .to(materialRef.current.uniforms.progress, {
-        value: 1,
-        duration: currentEffect.transitionDuration,
-        ease: 'power3.inOut',
-        onComplete: () => {
-          setCurrentIndex(prevIndex);
-          // If we still want autoplay after manual navigation:
-          if (autoplay) {
-            startAutoplay();
-          }
+    // **Set direction to -1** for right-to-left
+    materialRef.current.uniforms.direction.value = -1;
+
+    startRendering();
+    newTimeline.to(materialRef.current.uniforms.progress, {
+      value: 1,
+      duration: effects.currentEffect.transitionDuration,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        setCurrentIndex(prevIndex);
+        stopRendering();
+        renderFrame();
+        if (autoplay) {
+          startAutoplay();
         }
-      });
+      },
+    });
   };
 
   return (
     <div className="hero-slider" ref={containerRef} style={{ width, height }}>
       <div className="hero-slider__content">
         <h1 className="hero-slider__title">{slides[currentIndex].title}</h1>
-        <p className="hero-slider__description">{slides[currentIndex].description}</p>
+        <p className="hero-slider__description">
+          {slides[currentIndex].description}
+        </p>
         <div className="hero-slider__buttons">
           {slides[currentIndex].buttonText && slides[currentIndex].buttonLink && (
-            <a href={slides[currentIndex].buttonLink} className="site-button btn btn-lg btnhover20">
+            <a
+              href={slides[currentIndex].buttonLink}
+              className="site-button btn btn-lg btnhover20"
+            >
               {slides[currentIndex].buttonText}
             </a>
           )}
         </div>
       </div>
-      <button className="hero-slider__nav hero-slider__nav--prev" onClick={goToPrevSlide}>
+
+      <button
+        className="hero-slider__nav hero-slider__nav--prev"
+        onClick={goToPrevSlide}
+      >
         <FontAwesomeIcon icon={faChevronLeft} />
       </button>
-      <button className="hero-slider__nav hero-slider__nav--next" onClick={goToNextSlide}>
+
+      <button
+        className="hero-slider__nav hero-slider__nav--next"
+        onClick={goToNextSlide}
+      >
         <FontAwesomeIcon icon={faChevronRight} />
       </button>
     </div>

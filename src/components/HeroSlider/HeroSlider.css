@@ -4,6 +4,8 @@
   height: 100vh;
   overflow: hidden;
   touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .hero-slider::after {

@@ -48,6 +48,7 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@iconify/react": "^5.0.1",
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.18",
     "@types/react-avatar-editor": "^13.0.3",

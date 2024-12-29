@@ -55,10 +55,10 @@ const baseSlides = [
   },
   {
     imageUrl: "/images/Slider/window1.jpg",
-    title: "Découvrez Nos Réalisations : Garantie de Qualité",
+    title: "Découvrez Nos Réalisations",
     description: "Parcourez notre sélection de projets en aluminium et PVC pour constater la qualité de notre savoir-faire. Laissez-vous inspirer et imaginez déjà votre propre transformation.",
     buttonText: "En savoir plus",
-    buttonLink: "/portfolio",
+    buttonLink: "/gallery",
     effect: {
       intensity: 0.8,
       duration: 2000,
@@ -67,7 +67,7 @@ const baseSlides = [
   },
   {
     imageUrl: "/images/Slider/shower1.jpg",
-    title: "Qui Sommes-Nous ? Apprenez à Nous Connaître",
+    title: "Apprenez à Nous Connaître",
     description: "Découvrez l’histoire de notre entreprise, nos valeurs et l’équipe passionnée qui se cache derrière chaque réalisation. Votre confiance est au cœur de notre engagement.",
     buttonText: "En savoir plus",
     buttonLink: "/about",
@@ -102,6 +102,7 @@ const baseSlides = [
     },
   },
 ];
+console.log(baseSlides)
 
 const LandingPage = (): ReactElement => {
   // Generate slides with random displacement maps
