@@ -1,0 +1,155 @@
+.cta-banner-section {
+    margin: 0;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #224067;
+    padding: 40px 120px;
+    max-width: 1000000px;
+    width: 100%;
+    height: auto; /* Changer la hauteur pour s'adapter au contenu */
+    overflow: hidden;
+  }
+  
+  .cta-content {
+    flex: 1;
+    z-index: 1;
+  }
+  
+  .cta-content h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    line-height: 1.4; /* Ajuster la hauteur de ligne pour une meilleure lisibilité */
+    color: #fff;
+  }
+  
+  .cta-content p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    color: #f0f4ff; /* Couleur du texte légèrement différente pour le contraste */
+  }
+  
+  .cta-button {
+    display: inline-block;
+    padding: 12px 30px; /* Augmenter légèrement le padding */
+    background-color: transparent; /* Pas de couleur de fond */
+    color: #fff; /* Texte blanc */
+    text-decoration: none;
+    border: 2px solid #fff; /* Bordure blanche */
+    border-radius: 5px; /* Coins arrondis */
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease; /* Transition fluide pour les effets au survol */
+  }
+  
+  .cta-button:hover {
+    background-color: #5c7389;
+    color: #fff;
+  }
+  
+  /* Right animation section */
+  .background-animation {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    width: 800px;
+    height: 800px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .circles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.122);
+    transform: translate(-50%, -50%);
+    animation: ripple 4s infinite;
+  }
+  
+  /* Different opacities for each circle */
+  .circles:nth-child(1) {
+    background-color: rgba(255, 255, 255, 0.35); /* Most opaque */
+  }
+  
+  .circles:nth-child(2) {
+    background-color: rgba(255, 255, 255, 0.2); /* Less opaque */
+    animation-delay: 0.5s;
+  }
+  
+  .circles:nth-child(3) {
+    background-color: rgba(255, 255, 255, 0.1); /* Least opaque */
+    animation-delay: 1s;
+  }
+  
+  @keyframes ripple {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 1;
+    }
+    100% {
+      width: 800px;
+      height: 800px;
+      opacity: 0;
+    }
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .cta-banner-section {
+      flex-direction: column; /* Empiler le contenu verticalement */
+      height: auto;
+      padding: 20px;
+    }
+  
+    .cta-content {
+      text-align: center;
+      margin-bottom: 20px; /* Espacement entre les sections empilées */
+    }
+  
+    .cta-content h2 {
+      font-size: 2rem;
+    }
+  
+    .cta-content p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+  
+    .cta-button {
+      font-size: 0.9rem;
+      padding: 10px 25px;
+    }
+  
+    .background-animation {
+      width: 600px;
+      height: 600px; /* Réduire la taille de l'animation pour les petits écrans */
+      transform: translate(50%, -50%); /* Ajuster l'alignement vertical */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .cta-content h2 {
+      font-size: 1.8rem; /* Taille de police plus petite pour les très petits écrans */
+    }
+  
+    .cta-button {
+      font-size: 0.8rem;
+      padding: 8px 20px; /* Réduire le padding pour des boutons plus petits */
+    }
+  
+    .background-animation {
+      width: 400px;
+      height: 400px; /* Réduire davantage la taille pour les petits écrans */
+      transform: translate(50%, -50%);
+    }
+  }
+  

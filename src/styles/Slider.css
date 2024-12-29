@@ -1,0 +1,129 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.slider {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.slider__slides {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.slider__control {
+  z-index: 100;
+  position: absolute;
+  left: 50px;
+  top: 50%;
+  width: 50px;
+  height: 50px;
+  margin-top: -25px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider__control--right {
+  left: auto;
+  right: 50px;
+  transform: rotate(180deg);
+}
+
+.slider__control-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 50px;
+  height: 2px;
+  background: #fff;
+}
+
+.slider__control-line:first-child {
+  transform: translateY(-50%) rotate(45deg);
+  transform-origin: 0 0;
+}
+
+.slider__control-line:last-child {
+  transform: translateY(-50%) rotate(-45deg);
+  transform-origin: 0 0;
+}
+
+.slide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transform-origin: center;
+  transform-style: preserve-3d;
+  will-change: transform, clip-path;
+}
+
+.slide__inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  will-change: clip-path;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.slide__inner:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.slide__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+}
+
+.slide__heading {
+  margin-bottom: 20px;
+  font-size: 60px;
+}
+
+.slide__text {
+  font-size: 25px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .slider__control {
+    width: 40px;
+    height: 40px;
+  }
+
+  .slide__heading {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+
+  .slide__text {
+    font-size: 20px;
+  }
+}

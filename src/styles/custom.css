@@ -1,0 +1,273 @@
+.tp-revslider-mainul {
+    height: 100vh !important;
+  }
+  
+  .logo-header img,
+  .logo-footer img {
+    height: auto;
+    width: 100%;
+    max-width: 95px;
+    max-height: 95px;
+  }
+  img {
+    border-radius: 5px;
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+  }
+  
+  /* header custom */
+  .header-transparent.overlay .main-bar,
+  .header-transparent .top-bar {
+    background-color: #ffffff00 !important;
+
+  }
+  .header-transparent .main-bar {
+    border: none !important;
+
+  }
+  
+  .header-transparent .is-fixed .main-bar {
+    position: fixed;
+    background-color: #fff !important;
+    height: 80px;
+  }
+  .header-transparent .dlab-topbar-left ul li a,
+  .dlab-topbar-left ul li a,
+  .dlab-topbar-right ul li a {
+    color: #224067;
+  }
+  .header-nav .nav > li > a {
+    border: none !important;
+  }
+  
+  .header-transparent .header-nav .nav > li > a {
+    color: #fff;
+  }
+  .header-transparent .is-fixed .header-nav .nav > li > a {
+    color: #224067;
+  }
+  .site-button {
+    border-radius: 5px !important;
+  }
+  .navbar-expand-lg .navbar-collapse {
+    display: flex !important;
+    padding: 10px 0 10px 0;
+    flex-basis: auto;
+  }
+  .site-button.circle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 40px;
+    line-height: 39px;
+    background-color: transparent;
+    outline-color: #fff;
+    outline-style: solid;
+    outline-width: 1px;
+    color: #fff;
+  }
+  
+  @media screen and (max-width: 991px) {
+    .mo-left .header-nav {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    .mo-left .header-nav .logo-header img {
+      max-width: 150px;
+      width: 100%;
+      vertical-align: vertical;
+    }
+  }
+  
+  .mo-left .navbar-toggler.open span {
+    background: #fff;
+  }
+  
+  /* section */
+  
+  .section-full {
+    background-color: #d1d6dea1;
+  }
+  /* extra-nav */
+  .extra-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    border-left: none !important;
+    margin-right: -15px;
+  }
+  
+  .extra-nav .extra-cell {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  
+  /* Medium and small screens */
+  @media screen and (max-width: 991px) {
+    .extra-nav {
+      position: absolute;
+      top: 50%;
+      left: 60%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  
+    .extra-nav .extra-cell {
+      flex-direction: row;
+  
+      justify-content: center;
+    }
+  
+    .site-button-link {
+      text-align: center;
+    }
+  
+    .navbar-toggler {
+      margin-top: 10px;
+    }
+  }
+  
+  .dlab-topbar-left ul li a:hover {
+    color: #f0f4ff;
+  }
+  
+  .radius-md {
+    border-radius: 12px !important;
+    height: 650px !important;
+    width: auto !important;
+    box-shadow: var(--color-secondry) 0px 0px 40px 0px;
+  }
+  
+  .section-bg-image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative; /* Useful for overlays */
+  }
+  
+  .section-bg-image::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.95
+    ); /* White overlay with 80% transparency */
+    z-index: 1; /* Ensures it appears above the background but below content */
+  }
+  
+  .section-bg-image > * {
+    position: relative;
+    z-index: 1; /* Ensures content appears above the overlay */
+  }
+  
+  .bg-pattern-1 {
+    background-image: url("/images/patterns/bg-pattern.png");
+  }
+  
+  .bg-pattern-2 {
+    background-image: url("/images/patterns/bg-pattern2.png");
+  }
+  
+  .bg-pattern-3 {
+    background-image: url("/images/patterns/bg-pattern3.png");
+  }
+  
+  .dz-banner-top {
+    padding-bottom: 50px;
+  }
+  
+  .dz-oil-industry-zone {
+    padding: 50px 160px;
+  }
+  @media only screen and (max-width: 1920px) {
+    .dz-oil-industry-zone {
+      padding: 50px 100px;
+    }
+  }
+  /* Sticky header toggler button color */
+  .header-transparent .is-fixed .navbar-toggler span {
+    background-color: #224067;
+  }
+  .header-transparent .navbar-toggler span {
+    background-color: #fff;
+  }
+  
+  @media only screen and (max-width: 991px) {
+    .header.dark .header-nav .nav > li > a,
+    .header-transparent .header-nav .nav > li > a,
+    .header.primary .header-nav .nav > li > a,
+    .header.blue .header-nav .nav > li > a,
+    .header.purpal .header-nav .nav > li > a,
+    .header.red .header-nav .nav > li > a,
+    .header.yellow .header-nav .nav > li > a,
+    .header.box.dark .header-nav .nav > li > a,
+    .header.box.overlay .header-nav .nav > li > a,
+    .header-curve [class*="bg-"] .header-nav .nav > li.active > a {
+      color: #224067;
+    }
+  }
+  @media screen and (max-width: 991px) {
+    .mo-left .header-nav .logo-header {
+      display: block;
+      float: none;
+      height: auto;
+      max-width: 100%;
+      padding: 0px 15px;
+      margin: 50px 15px;
+      width: 100%;
+    }
+  }
+  
+  .service-box-4 .service-images img {
+    width: 220px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 30px 0px;
+    border-radius: 50px !important;
+    border-width: 10px;
+    border-style: solid;
+    border-color: rgb(255, 255, 255);
+    border-image: initial;
+    transition: all 0.5s ease 0s;
+  }
+  
+  .overlay-black-middle:after {
+    opacity: 0.75;
+  }
+  
+  .overlay-black-middle:after {
+    background: #6f6f6fcf;
+  }
+  
+  .overlay-gray-middle {
+    position: relative;
+  }
+  .overlay-gray-middle::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.75;
+    background: #7f8a8aab;
+    z-index: 1000; /* Make sure overlay is above the canvas */
+    pointer-events: none; /* optional, so overlay doesn't block clicks */
+  }
+  
+  .overlay-gray-middle:after {
+    background: #1a1c1cc2;
+  }
+  

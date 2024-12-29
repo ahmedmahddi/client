@@ -1,0 +1,253 @@
+h1 {
+    color: #224067;
+  }
+  
+  .feature-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+    background-color: #fff;
+    height: 100%;
+  }
+  
+  .feature-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .feature-icon {
+    font-size: 40px;
+    color: #224067;
+    margin-bottom: 15px;
+  }
+  
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #224067;
+  }
+  
+  .feature-description {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* Optional: Adjust card height for alignment */
+  .card-wrapper {
+    display: flex;
+  }
+  
+  /* Optional: Responsive adjustments */
+  @media (max-width: 768px) {
+    .centered-list {
+      max-width: 90%;
+    }
+  }
+  
+  .mot-du-fondateur {
+    background-color: #f9f9f9; /* Couleur de fond légère pour différencier la section */
+    padding: 15px;
+    border-left: 4px solid #224067; /* Accent visuel pour attirer l'attention */
+    margin-bottom: 30px;
+  }
+  
+  .mot-du-fondateur h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .mot-du-fondateur p {
+    font-size: 16px;
+    color: #555;
+    font-style: italic; /* Pour donner un effet de citation */
+  }
+  
+  .mot-du-fondateur {
+    animation: fadeIn 2s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Ajustements pour le carrousel */
+  .carousel-inner {
+    max-height: 850px; /* Définir une hauteur maximale pour le conteneur du carrousel */
+    overflow: hidden; /* Assurer que tout dépassement est masqué */
+  }
+  
+  .carousel-inner img {
+    max-height: 850px; /* Hauteur maximale des images */
+    width: 100%; /* Assurer que l'image occupe toute la largeur du conteneur */
+    object-fit: cover; /* Remplir le conteneur sans déformer l'image */
+  }
+  
+  /* Ajustements pour la section texte */
+  .bg-primary {
+    background-color: #224067 !important; /* Couleur primaire personnalisée */
+  }
+  
+  .content-bx1 h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .icon-bx-wraper .dlab-tilte {
+    font-size: 1.2rem;
+    color: #ffffff;
+  }
+  
+  .icon-bx-wraper p {
+    font-size: 1rem;
+    color: #e0e0e0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 767px) {
+    .carousel-inner {
+      max-height: 500px; /* Ajuster la hauteur maximale pour les petits écrans */
+    }
+  
+    .carousel-inner img {
+      max-height: 500px; /* Ajuster la hauteur maximale pour les petits écrans */
+    }
+  }
+  
+  /* Classe personnalisée pour le fond et le texte */
+  .bg-custom {
+    background-color: #224067; /* Couleur de fond personnalisée */
+    color: #ffffff; /* Couleur du texte en blanc */
+    padding: 20px 0; /* Ajout d'un padding vertical */
+  }
+  
+  /* Optionnel : Styles pour les titres et sous-titres */
+  .bg-custom h2,
+  .bg-custom h4 {
+    color: #ffffff; /* Assure que les titres et sous-titres sont en blanc */
+  }
+  
+  /* Optionnel : Styles pour les icônes */
+  .bg-custom i {
+    color: #ffffff; /* Assure que les icônes sont en blanc */
+  }
+  
+  /* Styles pour les animations WOW.js */
+  .wow.zoomIn {
+    animation: zoomIn 1s forwards;
+  }
+  
+  @keyframes zoomIn {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  /* Styles pour les compteurs */
+  .counter {
+    font-size: 2.5rem; /* Taille de police pour les compteurs */
+    font-weight: bold; /* Poids de la police pour les compteurs */
+  }
+  
+  /* Ajustements responsives */
+  @media (max-width: 767px) {
+    .bg-custom {
+      padding: 30px 0; /* Réduction du padding sur petits écrans */
+    }
+  
+    .counter {
+      font-size: 2rem; /* Ajustement de la taille des compteurs sur petits écrans */
+    }
+  }
+  
+  /* partners */
+  
+  .page-content {
+    margin-top: 0;
+    padding-bottom: 0px;
+  }
+  
+  .dlab-img-overlay1:before {
+    height: 180px;
+  }
+
+  
+  .service-section {
+    padding: 60px 0;
+  }
+  
+  .service-card {
+    background-color: #fff;
+    border: none;
+    text-align: center;
+    padding: 30px 20px;
+    border-radius: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+  }
+  
+  .service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .service-icon {
+    font-size: 50px;
+    color: #224067;
+    margin-bottom: 20px;
+  }
+  
+  .service-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #224067;
+  }
+  
+  .service-description {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* Background Overlay Adjustment */
+  .overlay-primary-middle {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .overlay-primary-middle::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(34, 64, 103, 0.8); /* Adjust opacity and color as needed */
+    z-index: -1;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .service-icon {
+      font-size: 40px;
+    }
+  
+    .service-title {
+      font-size: 1.25rem;
+    }
+  }
+  
+  
+  
