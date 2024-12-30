@@ -48,6 +48,8 @@ const ImageListPage = () => {
     title: '',
     category: '',
   });
+  const [newCategory, setNewCategory] = useState<string>('');
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchedImages = [
@@ -66,7 +68,7 @@ const ImageListPage = () => {
     ];
     
     const uniqueCategories = ['all', ...new Set(fetchedImages.map(img => img.category))];
-    setCategories(uniqueCategories);
+    setCategories([...uniqueCategories, 'Autre']);
     setImages(fetchedImages);
   }, []);
 
@@ -129,12 +131,31 @@ const ImageListPage = () => {
     }
   };
 
-  const handleAddSave = () => {
-    if (newImage.src && newImage.title && newImage.category) {
-      const newId = Math.max(...images.map(img => img.id)) + 1;
-      setImages(prev => [...prev, { ...newImage, id: newId }]);
-      setAddDialogOpen(false);
-      setNewImage({ src: '', title: '', category: '' });
+  const handleCategoryChange = (e: any) => {
+    const value = e.target.value;
+    if (value === 'Autre') {
+      setShowNewCategoryInput(true);
+    } else {
+      setShowNewCategoryInput(false);
+      if (editedImage) {
+        setEditedImage({ ...editedImage, category: value });
+      }
+    }
+  };
+
+  const handleNewCategorySubmit = () => {
+    if (newCategory.trim()) {
+      // Add new category to categories list
+      setCategories(prev => [...prev.filter(cat => cat !== 'Autre'), newCategory, 'Autre']);
+      
+      // Update the edited image with new category
+      if (editedImage) {
+        setEditedImage({ ...editedImage, category: newCategory });
+      }
+      
+      // Reset states
+      setNewCategory('');
+      setShowNewCategoryInput(false);
     }
   };
 
@@ -298,7 +319,7 @@ const ImageListPage = () => {
                   <Select
                     value={editedImage?.category ?? ''}
                     label="Catégorie"
-                    onChange={(e) => setEditedImage(prev => prev ? { ...prev, category: e.target.value } : null)}
+                    onChange={handleCategoryChange}
                   >
                     {categories.filter(cat => cat !== 'all').map((category) => (
                       <MenuItem key={category} value={category}>
@@ -307,6 +328,24 @@ const ImageListPage = () => {
                     ))}
                   </Select>
                 </FormControl>
+                {showNewCategoryInput && (
+                  <Stack direction="row" spacing={2}>
+                    <TextField
+                      fullWidth
+                      label="Nouvelle catégorie"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      size="small"
+                    />
+                    <Button 
+                      variant="contained" 
+                      onClick={handleNewCategorySubmit}
+                      disabled={!newCategory.trim()}
+                    >
+                      Ajouter
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
             </Grid>
           </Grid>
@@ -406,7 +445,14 @@ const ImageListPage = () => {
                   <Select
                     value={newImage.category}
                     label="Catégorie"
-                    onChange={(e) => setNewImage(prev => ({ ...prev, category: e.target.value }))}
+                    onChange={(e) => {
+                      if (e.target.value === 'Autre') {
+                        setShowNewCategoryInput(true);
+                      } else {
+                        setShowNewCategoryInput(false);
+                        setNewImage(prev => ({ ...prev, category: e.target.value }));
+                      }
+                    }}
                   >
                     {categories.filter(cat => cat !== 'all').map((category) => (
                       <MenuItem key={category} value={category}>
@@ -415,6 +461,15 @@ const ImageListPage = () => {
                     ))}
                   </Select>
                 </FormControl>
+                {showNewCategoryInput && (
+                  <TextField
+                    fullWidth
+                    label="Nouvelle catégorie"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    size="small"
+                  />
+                )}
               </Stack>
             </Grid>
           </Grid>
@@ -423,13 +478,35 @@ const ImageListPage = () => {
           <Button onClick={() => {
             setAddDialogOpen(false);
             setNewImage({ src: '', title: '', category: '' });
+            setShowNewCategoryInput(false);
+            setNewCategory('');
           }}>
             Annuler
           </Button>
           <Button 
-            onClick={handleAddSave} 
+            onClick={() => {
+              if (showNewCategoryInput && newCategory.trim()) {
+                // Add new category first
+                setCategories(prev => [...prev.filter(cat => cat !== 'Autre'), newCategory, 'Autre']);
+                setNewImage(prev => ({ ...prev, category: newCategory }));
+                
+                // Then add the new image
+                const newId = Math.max(...images.map(img => img.id)) + 1;
+                setImages(prev => [...prev, { ...newImage, id: newId, category: newCategory }]);
+              } else {
+                // Just add the new image with existing category
+                const newId = Math.max(...images.map(img => img.id)) + 1;
+                setImages(prev => [...prev, { ...newImage, id: newId }]);
+              }
+              
+              // Reset all states
+              setAddDialogOpen(false);
+              setNewImage({ src: '', title: '', category: '' });
+              setShowNewCategoryInput(false);
+              setNewCategory('');
+            }}
             variant="contained"
-            disabled={!newImage.src || !newImage.title || !newImage.category}
+            disabled={!newImage.src || !newImage.title || (showNewCategoryInput ? !newCategory.trim() : !newImage.category)}
           >
             Ajouter
           </Button>

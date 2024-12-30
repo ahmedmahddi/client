@@ -19,26 +19,10 @@ const defaultNavItems: NavItem[] = [
   },
   {
     id: 2,
-    path: 'gallery',
+    path: 'gallery/list',
     title: 'Portfolio',
     icon: 'lucide:briefcase',
     active: false,
-    subMenu: [
-      {
-        id: 21,
-        path: 'gallery/list',
-        title: 'Liste des Images',
-        icon: 'lucide:image',
-        active: false,
-      },
-      {
-        id: 22,
-        path: 'gallery/new',
-        title: 'Ajouter des Images',
-        icon: 'lucide:plus-circle',
-        active: false,
-      }
-    ]
   },
   {
     id: 3,
@@ -79,21 +63,21 @@ const defaultNavItems: NavItem[] = [
   },
   {
     id: 6,
-    path: '#!',
+    path: 'devis',
     title: 'Devis',
     icon: 'lucide:file-text',
     active: false,
   },
   {
     id: 7,
-    path: '#!',
-    title: 'Nouveau Clients',
+    path: 'messages',
+    title: 'Contactez Nous',
     icon: 'lucide:mail',
     active: false,
   },
   {
     id: 8,
-    path: '#!',
+    path: 'blogs',
     title: 'Blog',
     icon: 'lucide:pencil',
     active: false,

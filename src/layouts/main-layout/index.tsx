@@ -8,7 +8,7 @@ export const drawerOpenWidth = 240;
 export const drawerCloseWidth = 110;
 
 const MainLayout = ({ children }: PropsWithChildren): ReactElement => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(true);
   const handleDrawerToggle = () => setOpen(!open);
 
   return (
@@ -29,7 +29,7 @@ const MainLayout = ({ children }: PropsWithChildren): ReactElement => {
             boxSizing: 'border-box', 
             width: drawerOpenWidth,
             border: 'none',
-            transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'width 200ms ease-in-out',
           },
         }}
       >
@@ -46,10 +46,11 @@ const MainLayout = ({ children }: PropsWithChildren): ReactElement => {
           width: open ? drawerOpenWidth : drawerCloseWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
             width: open ? drawerOpenWidth : drawerCloseWidth,
             border: 'none',
+            transition: 'width 200ms ease-in-out',
             overflowX: 'hidden',
-            transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)',
           },
         }}
       >

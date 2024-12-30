@@ -25,7 +25,6 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 interface Slide {
   imageUrl: string;
   title: string;
-  type: string;
   description: string;
 }
 
@@ -93,34 +92,29 @@ const compressImage = async (file: File): Promise<Blob> => {
 
 const initialSlides: Slide[] = [
   {
-    imageUrl: '/images/garde-corp1.jpg',
-    title: 'Garde Corps',
-    type: 'FLOWER',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit...',
+    imageUrl: '/images/Slider/doors1.jpg',
+    title: 'Votre Projet, Notre Priorité',
+    description: 'Découvrez comment nos solutions de menuiserie aluminium et PVC, conçues sur mesure, peuvent concrétiser vos idées. Nous sommes à vos côtés à chaque étape pour vous offrir la qualité et l’accompagnement que vous méritez.',
   },
   {
-    imageUrl: '/images/porte-fenetre.jpg',
-    title: 'Porte Fenêtre',
-    type: 'NATURE',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit...',
+    imageUrl: '/images/Slider/window1.jpg',
+    title: 'Découvrez Nos Réalisations',
+    description: "Parcourez notre sélection de projets en aluminium et PVC pour constater la qualité de notre savoir-faire. Laissez-vous inspirer et imaginez déjà votre propre transformation.",
   },
   {
-    imageUrl: '/images/porte-fenetre2.jpg',
-    title: 'Porte Fenêtre',
-    type: 'NATURE',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit...',
+    imageUrl: '/images/Slider/shower1.jpg',
+    title: "Apprenez à Nous Connaître",
+    description: "Découvrez l’histoire de notre entreprise, nos valeurs et l’équipe passionnée qui se cache derrière chaque réalisation. Votre confiance est au cœur de notre engagement.",
   },
   {
-    imageUrl: '/images/window3.jpg',
-    title: 'Fenêtre',
-    type: 'NATURE',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit...',
+    imageUrl: '/images/Slider/office.jpg',
+    title: "Parlons de Vos Idées",
+    description: "Prêt à faire passer votre projet à l’étape suivante ? Contactez-nous dès maintenant et bénéficiez de nos conseils personnalisés pour donner vie à vos envies.",
   },
   {
-    imageUrl: '/images/shower1.jpg',
-    title: 'Douches',
-    type: 'NATURE',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit...',
+    imageUrl: '/images/Slider/stairs1.jpg',
+    title: "Inspirez-Vous",
+    description: "Retrouvez nos meilleurs conseils, idées et astuces pour améliorer votre maison grâce à la menuiserie aluminium et PVC. Faites le plein d’inspiration pour un intérieur qui vous ressemble.",
   },
 ];
 
@@ -131,7 +125,6 @@ const SliderPage = (): ReactElement => {
   const [currentSlide, setCurrentSlide] = useState<Slide>({
     imageUrl: '',
     title: '',
-    type: '',
     description: '',
   });
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -151,7 +144,6 @@ const SliderPage = (): ReactElement => {
       setCurrentSlide({
         imageUrl: '',
         title: '',
-        type: '',
         description: '',
       });
       setPreviewUrl('');
@@ -165,7 +157,6 @@ const SliderPage = (): ReactElement => {
     setCurrentSlide({
       imageUrl: '',
       title: '',
-      type: '',
       description: '',
     });
     setPreviewUrl('');
@@ -218,10 +209,6 @@ const SliderPage = (): ReactElement => {
       // Validate required fields
       if (!currentSlide.title.trim()) {
         setError('Title is required');
-        return;
-      }
-      if (!currentSlide.type.trim()) {
-        setError('Type is required');
         return;
       }
       if (!currentSlide.imageUrl) {
@@ -413,14 +400,6 @@ const SliderPage = (): ReactElement => {
               error={error === 'Title is required'}
             />
             <TextField
-              label="Type"
-              fullWidth
-              required
-              value={currentSlide.type}
-              onChange={(e) => handleInputChange('type', e.target.value)}
-              error={error === 'Type is required'}
-            />
-            <TextField
               label="Description"
               fullWidth
               multiline
@@ -438,7 +417,7 @@ const SliderPage = (): ReactElement => {
             onClick={handleSave} 
             variant="contained" 
             color="primary"
-            disabled={isUploading || !previewUrl || !currentSlide.title || !currentSlide.type}
+            disabled={isUploading || !previewUrl || !currentSlide.title}
           >
             {isUploading ? 'Uploading...' : 'Sauvegarder'}
           </Button>

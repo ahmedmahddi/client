@@ -38,7 +38,7 @@ const NavItem = ({ navItem, open }: { navItem: NavItemProps; open: boolean }) =>
             minHeight: 48,
             opacity: navItem.active ? 1 : 0.5,
             bgcolor: navItem.active ? (open ? 'primary.main' : '') : 'background.default',
-            transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'background-color 200ms ease-in-out',
             '&:hover': {
               bgcolor:
                 navItem.active
@@ -57,7 +57,7 @@ const NavItem = ({ navItem, open }: { navItem: NavItemProps; open: boolean }) =>
               width: 20,
               height: 20,
               mr: open ? 'auto' : 0,
-              transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'margin 200ms ease-in-out',
               color:
                 navItem.active
                   ? open
@@ -73,16 +73,15 @@ const NavItem = ({ navItem, open }: { navItem: NavItemProps; open: boolean }) =>
               <ListItemText 
                 primary={navItem.title}
                 sx={{ 
-                  opacity: open ? 1 : 0,
+                  opacity: 1,
                   color: navItem.active ? 'background.default' : '',
-                  transition: 'opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)',
                 }} 
               />
               {navItem.subMenu && (
                 <ExpandMore
                   sx={{
                     transform: subMenuOpen ? 'rotate(-180deg)' : 'rotate(0)',
-                    transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'transform 200ms ease-in-out',
                   }}
                 />
               )}

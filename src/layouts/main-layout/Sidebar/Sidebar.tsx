@@ -18,7 +18,7 @@ const Sidebar = ({ open }: { open: boolean }): ReactElement => {
       display: 'flex', 
       flexDirection: 'column',
       height: '100%',
-      transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: 'width 200ms ease-in-out',
     }}>
       <Toolbar
         sx={{
@@ -27,7 +27,7 @@ const Sidebar = ({ open }: { open: boolean }): ReactElement => {
           justifyContent: 'center',
           flexShrink: 0,
           width: open ? drawerOpenWidth - 1 : drawerCloseWidth - 1,
-          transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'width 200ms ease-in-out',
         }}
       >
         <Link
@@ -37,7 +37,7 @@ const Sidebar = ({ open }: { open: boolean }): ReactElement => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'width 200ms ease-in-out',
           }}
         >
           <Image
@@ -45,7 +45,7 @@ const Sidebar = ({ open }: { open: boolean }): ReactElement => {
             alt={open ? 'logo with text' : 'logo'}
             height={65}
             style={{
-              transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'width 200ms ease-in-out',
             }}
           />
         </Link>
@@ -53,7 +53,7 @@ const Sidebar = ({ open }: { open: boolean }): ReactElement => {
       <Box sx={{ 
         flexGrow: 1,
         minHeight: 0,
-        transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'width 200ms ease-in-out',
       }}>
         <SimpleBar 
           style={{ 
@@ -67,7 +67,7 @@ const Sidebar = ({ open }: { open: boolean }): ReactElement => {
               mt: 5,
               py: 1,
               justifyContent: 'space-between',
-              transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'width 200ms ease-in-out',
             }}
           >
             {navItems.map((navItem) => (

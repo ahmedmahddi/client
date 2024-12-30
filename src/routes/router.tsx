@@ -47,12 +47,14 @@ const Dashboard = lazy<() => ReactElement>(() => import('pages/dashboard/Dashboa
 const Login = lazy<() => ReactElement>(() => import('pages/authentication/Login'));
 const SignUp = lazy<() => ReactElement>(() => import('pages/authentication/SignUp'));
 const ErrorPage = lazy<() => ReactElement>(() => import('pages/error/ErrorPage'));
-const NewImagePage = lazy<() => ReactElement>(() => import('pages/admin/Gallery/NewImagePage'));
 const PortfolioListPage = lazy<() => ReactElement>(() => import('pages/admin/Gallery/PortfolioListPage'));
 const ProductsListPage = lazy<() => ReactElement>(() => import('pages/admin/Services/ProductsListPage'));
 const TestimonialsPage = lazy<() => ReactElement>(() => import('pages/admin/About/TestimonialsPage'));
 const PartnersPage = lazy<() => ReactElement>(() => import('pages/admin/About/PartnersPage'));
 const SliderPage = lazy<() => ReactElement>(() => import('pages/admin/Slider/SliderPage'));
+const DevisListPage = lazy<() => ReactElement>(() => import('pages/admin/Devis/DevisListPage'));
+const MessagesListPage = lazy<() => ReactElement>(() => import('pages/admin/Contact/MessagesListPage'));
+const BlogListPage = lazy<() => ReactElement>(() => import('pages/Blog/BlogListPage'));
 
 const routes: RouteObject[] = [
   {
@@ -139,10 +141,6 @@ const routes: RouteObject[] = [
                 path: 'list',
                 element: <PortfolioListPage />
               },
-              {
-                path: 'new',
-                element: <NewImagePage />
-              }
             ]
           },
           {
@@ -170,7 +168,19 @@ const routes: RouteObject[] = [
           {
             path: 'slider',
             element: <SliderPage />
-          }
+          },
+          {
+            path:'devis',
+            element: <DevisListPage />
+          },
+          {
+            path:'messages',
+            element: <MessagesListPage />
+          },
+          {
+            path: 'blogs',
+            element: <BlogListPage />,
+          },
         ],
       },
       {
