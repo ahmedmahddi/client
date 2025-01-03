@@ -33,12 +33,8 @@ const Login = (): ReactElement => {
   };
 
   return (
-    <>
-      <Box component="figure" mb={5} mx="auto" textAlign="center">
-        <Link href={RootPaths.adminRoot}>
-          <Image src={logoWithText} alt="logo with text" height={60} />
-        </Link>
-      </Box>
+    <div>
+
       <Paper
         sx={{
           py: 6,
@@ -46,6 +42,11 @@ const Login = (): ReactElement => {
         }}
       >
         <Stack justifyContent="center" gap={5}>
+        <Box component="figure" mb={5} mx="auto" textAlign="center">
+        <Link href={RootPaths.adminRoot}>
+          <Image src={logoWithText} alt="logo with text" height={90} />
+        </Link>
+      </Box>
           <Typography variant="h3" textAlign="center" color="text.secondary">
             Log In
           </Typography>
@@ -134,36 +135,9 @@ const Login = (): ReactElement => {
             Log In
           </Button>
           <Divider />
-          <Typography textAlign="center" color="text.secondary" variant="body1">
-            Or sign in using:
-          </Typography>
-          <Stack gap={1.5} direction="row" justifyContent="space-between">
-            <Button
-              startIcon={<IconifyIcon icon="flat-color-icons:google" />}
-              variant="outlined"
-              fullWidth
-              sx={{
-                fontSize: 'subtitle2.fontSize',
-                fontWeight: 'fontWeightRegular',
-              }}
-            >
-              Google
-            </Button>
-            <Button
-              startIcon={<IconifyIcon icon="logos:facebook" />}
-              variant="outlined"
-              fullWidth
-              sx={{
-                fontSize: 'subtitle2.fontSize',
-                fontWeight: 'fontWeightRegular',
-              }}
-            >
-              Facebook
-            </Button>
-          </Stack>
         </Stack>
       </Paper>
-    </>
+    </div>
   );
 };
 
